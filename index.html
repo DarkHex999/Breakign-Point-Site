@@ -4,9 +4,144 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Breaking Point Site</title>
-  <link rel="stylesheet" href="style.css">
   <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    .modern-header {
+      background: linear-gradient(135deg, #ff0000, #2575fc);
+      padding: 20px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .modern-nav {
+      display: flex;
+      justify-content: center;
+      flex-direction: row-reverse;
+    }
+    .nav-link {
+      flex-shrink: 1;
+      text-align: center;
+      font-size: 1em;
+      padding: 10px 20px;
+      margin: 0 10px;
+      text-decoration: none;
+      color: white;
+      border-radius: 25px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    @media (max-width: 480px) {
+      .nav-link {
+        font-size: 0.6em;
+        padding: 5px 10px;
+      }
+    }
+    .modern-main {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .game-section {
+      order: 1;
+      width: 30%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .content-section {
+      order: 2;
+      width: 70%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .game-image-container {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .game-image-label {
+      border: 1px solid #000;
+      background-color: #f2f2f2;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-family: 'Arial Black', Gadget, sans-serif;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .game-image {
+      width: 100%;
+      display: block;
+    }
+    .game-image img {
+      width: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+    .game-image img:hover {
+      transform: scale(0.95);
+    }
+    .store-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .store-button {
+      width: 80px;
+      height: 80px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .store-button:hover {
+      transform: scale(0.95);
+    }
+    .store-button img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .content-container {
+      width: 100%;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .content-text {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
     .content-area {
+      height: 300px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 10px;
       white-space: pre-line;
       line-height: 1.8;
       font-size: 16px;
@@ -14,12 +149,75 @@
       direction: ltr;
       text-align: left;
     }
+    .modern-footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .footer-bar {
+      width: 100%;
+      background-color: #000;
+      padding: 10px 0;
+    }
+    .footer-text {
+      font-size: 1em;
+      color: white;
+    }
+    @media (max-width: 768px) {
+      .modern-main {
+        flex-direction: column;
+      }
+      .game-section,
+      .content-section {
+        width: 100%;
+      }
+    }
+    #dynamic-content {
+      direction: ltr;
+      text-align: left;
+    }
+    /* Container for popup messages */
+    #popup-container {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+    /* Popup message styles */
+    .popup-message {
+      background-color: #b58900;
+      color: #fff;
+      padding: 20px 30px;
+      border-radius: 15px;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .popup-message .timeline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background-color: #fff;
+      width: 100%;
+    }
+    .popup-icon {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
   </style>
 </head>
 <body>
   <header class="modern-header">
     <nav class="modern-nav">
-      <!-- زر Home مع وصف اللعبة -->
       <a href="#" class="nav-link active" 
          data-content="Welcome to Breaking Point Site👋🏻" 
          data-area-content="<strong>Breaking Point</strong> is a fast-paced 3v3 FPS shooter featuring intense gunfights, strategic gameplay, and unique character abilities. Choose your loadout, master your skills, and outplay opponents in adrenaline-fueled battles. With a vast arsenal of weapons, tactical gadgets, and smooth controls, every match is an action-packed experience. Are you ready to dominate the battlefield?<br><br><strong>Tons of Weapons:</strong><br>M4, AC55, 9A, Uzi, Pistol, Cyber Pistol 🔫🤖<br>Sniper, Shotgun, Katana 🎯🔪<br>RPG, Spider Gun 🕷, Smoke Knife 🚀💨🔪<br><br><strong>Tactical Skills:</strong><br>Inhalant – Recover health ❤️‍🩹<br>Smoke Grenade – Tactical cover 💨💣<br>Drone – Scout the battlefield ✈<br>C4 – High-explosive trap 💣<br>Crystal Bomb – Sci-fi explosive 🔮<br>Bloden See – Unleash a blood surge 🩸<br>Fly Magic – Gain temporary flight 🧙🏻‍♂️<br>Ice Wall – Create defensive barriers 🧊">
@@ -41,7 +239,7 @@
       <div class="game-image-container">
         <p class="game-image-label">Breaking Point: Fps Shooter</p>
         <div class="game-image">
-          <img src="https://raw.githubusercontent.com/DarkHex999/Breakign-Point-Site/refs/heads/main/DALL%C2%B7E%202024-10-02%2009.23.16%20-%20A%20third-person%20perspective%20logo%20design%20for%20an%20FPS%20game.%20The%20player%20is%20seen%20from%20the%20back%2C%20with%20an%20M4%20rifle%20strapped%20to%20their%20back%2C%20while%20holding%20a%20kni.jpg" alt="صورة اللعبة">
+          <img src="https://raw.githubusercontent.com/DarkHex999/Breakign-Point-Site/refs/heads/main/DALL%C2%B7E%202024-10-02%2009.23.16%20-%20A%20third-person%20perspective%20logo%20design%20for%20an%20FPS%20game.%20The%20player%20is%20seen%20from%20the%20back,%20with%20an%20M4%20rifle%20strapped%20to%20their%20back,%20while%20holding%20a%20kni.jpg" alt="صورة اللعبة">
         </div>
         <div class="store-buttons">
           <a href="#" class="store-button">
@@ -73,7 +271,7 @@
     </div>
   </footer>
 
-  <!-- سياسة الخصوصية مخفية داخل الصفحة بدون فراغات زائدة -->
+  <!-- Hidden Privacy Policy content -->
   <div id="privacy-policy-content" style="display: none;">
     <h2>Privacy Policy – Breaking Point</h2>
     <p><strong>Last Updated: [3/22/2025]</strong></p>
@@ -88,8 +286,11 @@
     <p>By playing Breaking Point, you acknowledge that you have read, understood, and agreed to this Privacy Policy. If you do not agree with any part of this policy, please refrain from using the game.</p>
   </div>
 
+  <!-- Container for popup messages -->
+  <div id="popup-container"></div>
+
   <script>
-    // عند تحميل الصفحة، تعيين محتوى وصف اللعبة ليكون نفس ما في زر Home
+    // Set initial content on page load
     document.addEventListener("DOMContentLoaded", function(){
       const homeLink = document.querySelector('.nav-link.active');
       const areaContent = document.getElementById("area-content");
@@ -115,6 +316,89 @@
         
         navLinks.forEach(navLink => navLink.classList.remove('active'));
         this.classList.add('active');
+      });
+    });
+
+    // Function to show a popup message using transitions for fade in and fade out
+    function showPopupMessage(storeType, iconSrc) {
+      let text = "";
+      if (storeType === "google") {
+        text = "The game on google play store is under review and will be available soon.";
+      } else if (storeType === "up") {
+        text = "The game on Up To Down store is under review and will be available soon.";
+      } else if (storeType === "aptoide") {
+        text = "The game on Aptoide store is under review and will be available soon.";
+      }
+      
+      const container = document.getElementById('popup-container');
+      const popup = document.createElement('div');
+      popup.className = 'popup-message';
+      // Ensure initial style for transition
+      popup.style.opacity = "0";
+      popup.style.transform = "translateY(20px)";
+      
+      // Create icon element
+      const icon = document.createElement('img');
+      icon.className = 'popup-icon';
+      icon.src = iconSrc;
+      popup.appendChild(icon);
+      
+      // Create text span
+      const textSpan = document.createElement('span');
+      textSpan.textContent = text;
+      popup.appendChild(textSpan);
+      
+      // Create timeline element
+      const timeline = document.createElement('div');
+      timeline.className = 'timeline';
+      popup.appendChild(timeline);
+      
+      container.appendChild(popup);
+      
+      // Force reflow then fade in
+      requestAnimationFrame(() => {
+        popup.style.opacity = "1";
+        popup.style.transform = "translateY(0)";
+      });
+      
+      // Animate timeline shrinking over 1.5 seconds
+      timeline.style.transition = "width 1.5s linear";
+      timeline.offsetWidth; // force reflow
+      timeline.style.width = "0";
+      
+      // بعد 1.5 ثانية ابدأ التلاشي
+      setTimeout(() => {
+        popup.style.opacity = "0";
+        popup.style.transform = "translateY(-20px)";
+      }, 1500);
+      
+      // إزالة العنصر بعد انتهاء تأثير التلاشي (0.5 ثانية)
+      setTimeout(() => {
+        if (container.contains(popup)) {
+          container.removeChild(popup);
+        }
+      }, 2100);
+    }
+
+    // Store buttons click event with distinct messages and icon insertion
+    document.querySelectorAll('.store-button').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const link = this.getAttribute('href').trim();
+        if(link === '#' || link === '') {
+          e.preventDefault();
+          const img = this.querySelector('img');
+          let storeType = "";
+          const altText = img.alt.toLowerCase();
+          if(altText.includes("google")) {
+            storeType = "google";
+          } else if(altText.includes("up to down") || altText.includes("up")) {
+            storeType = "up";
+          } else if(altText.includes("aptoide")) {
+            storeType = "aptoide";
+          }
+          const iconSrc = img.getAttribute('src');
+          showPopupMessage(storeType, iconSrc);
+        }
       });
     });
   </script>
