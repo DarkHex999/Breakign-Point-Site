@@ -1,469 +1,406 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Hex</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #0a0a0a;
-            color: #f0f0f0;
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .background-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0.8) 100%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-        }
-
-        header {
-            padding: 2rem;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            margin-bottom: 1rem;
-            display: inline-block;
-            position: relative;
-        }
-
-        .logo::after {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        nav a {
-            color: #ffffff;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        nav a.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        nav a::before {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0%;
-            height: 2px;
-            background-color: #ffffff;
-            transition: width 0.2s ease;
-        }
-
-        nav a:hover::before {
-            width: 100%;
-        }
-
-        main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            position: relative;
-            display: inline-block;
-            padding-bottom: 0.5rem;
-        }
-
-        .section-title::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), transparent);
-        }
-
-        .page-section {
-            opacity: 0;
-            display: none;
-            transition: opacity 0.3s ease;
-            position: absolute;
-            width: 100%;
-            left: 0;
-        }
-
-        .page-section.active {
-            opacity: 1;
-            display: block;
-            position: relative;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .assets-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .asset-card {
-            background: rgba(20, 20, 20, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .asset-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .asset-image {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .asset-info {
-            padding: 1rem;
-        }
-
-        .asset-title {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .contact-section {
-            margin-top: 4rem;
-            padding: 2rem;
-            background: rgba(20, 20, 20, 0.7);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .contact-email {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .email-icon {
-            font-size: 1.2rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .copyright {
-            opacity: 0.7;
-            font-size: 0.9rem;
-        }
-
-        /* Page Transition Animation - Now Faster */
-        .page-transition {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            clip-path: circle(0% at 50% 50%);
-            display: none;
-            transition: clip-path 0.25s ease-in-out;
-        }
-
-        .page-transition.active {
-            display: block;
-            clip-path: circle(150% at 50% 50%);
-        }
-
-        .page-transition.closing {
-            clip-path: circle(0% at 50% 50%);
-        }
-        
-        .home-content {
-            line-height: 1.6;
-            max-width: 800px;
-        }
-        
-        .home-content p {
-            margin-bottom: 1rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breaking Point Site</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    .modern-header {
+      background: linear-gradient(135deg, #ff0000, #2575fc);
+      padding: 20px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .modern-nav {
+      display: flex;
+      justify-content: center;
+      flex-direction: row-reverse;
+    }
+    .nav-link {
+      flex-shrink: 1;
+      text-align: center;
+      font-size: 1em;
+      padding: 10px 20px;
+      margin: 0 10px;
+      text-decoration: none;
+      color: white;
+      border-radius: 25px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    @media (max-width: 480px) {
+      .nav-link {
+        font-size: 0.6em;
+        padding: 5px 10px;
+      }
+    }
+    .modern-main {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .game-section {
+      order: 1;
+      width: 30%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .content-section {
+      order: 2;
+      width: 70%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .game-image-container {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .game-image-label {
+      border: 1px solid #000;
+      background-color: #f2f2f2;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-family: 'Arial Black', Gadget, sans-serif;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .game-image {
+      width: 100%;
+      display: block;
+    }
+    .game-image img {
+      width: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+    .game-image img:hover {
+      transform: scale(0.95);
+    }
+    .store-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .store-button {
+      width: 80px;
+      height: 80px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .store-button:hover {
+      transform: scale(0.95);
+    }
+    .store-button img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .content-container {
+      width: 100%;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .content-text {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    .content-area {
+      height: 300px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 10px;
+      white-space: pre-line;
+      line-height: 1.8;
+      font-size: 16px;
+      word-wrap: break-word;
+      direction: ltr;
+      text-align: left;
+    }
+    .modern-footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .footer-bar {
+      width: 100%;
+      background-color: #000;
+      padding: 10px 0;
+    }
+    .footer-text {
+      font-size: 1em;
+      color: white;
+    }
+    @media (max-width: 768px) {
+      .modern-main {
+        flex-direction: column;
+      }
+      .game-section,
+      .content-section {
+        width: 100%;
+      }
+    }
+    #dynamic-content {
+      direction: ltr;
+      text-align: left;
+    }
+    /* Container for popup messages */
+    #popup-container {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+    /* Popup message styles */
+    .popup-message {
+      background-color: #b58900;
+      color: #fff;
+      padding: 20px 30px;
+      border-radius: 15px;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .popup-message .timeline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background-color: #fff;
+      width: 100%;
+    }
+    .popup-icon {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
-    <div class="background-container">
-        <div class="vignette"></div>
-        <canvas id="hologramCanvas"></canvas>
+  <header class="modern-header">
+    <nav class="modern-nav">
+      <a href="#" class="nav-link active" 
+         data-content="Welcome to Breaking Point Site👋🏻" 
+         data-area-content="<strong>Breaking Point</strong> is a fast-paced 3v3 FPS shooter featuring intense gunfights, strategic gameplay, and unique character abilities. Choose your loadout, master your skills, and outplay opponents in adrenaline-fueled battles. With a vast arsenal of weapons, tactical gadgets, and smooth controls, every match is an action-packed experience. Are you ready to dominate the battlefield?<br><br><strong>Tons of Weapons:</strong><br>M4, AC55, 9A, Uzi, Pistol, Cyber Pistol 🔫🤖<br>Sniper, Shotgun, Katana 🎯🔪<br>RPG, Spider Gun 🕷, Smoke Knife 🚀💨🔪<br><br><strong>Tactical Skills:</strong><br>Inhalant – Recover health ❤️‍🩹<br>Smoke Grenade – Tactical cover 💨💣<br>Drone – Scout the battlefield ✈<br>C4 – High-explosive trap 💣<br>Crystal Bomb – Sci-fi explosive 🔮<br>Bloden See – Unleash a blood surge 🩸<br>Fly Magic – Gain temporary flight 🧙🏻‍♂️<br>Ice Wall – Create defensive barriers 🧊">
+        Home
+      </a>
+      <a href="#" class="nav-link" 
+         data-content="Contact Me If You Encounter Any Problems or Have Any Questions📩:" 
+         data-area-content="To communicate via email: masccopp@gmail.com">
+        Contact Me
+      </a>
+      <a href="#" class="nav-link" data-content="Explanation of the game's Privacy Policy📜">
+        Privacy Policy
+      </a>
+    </nav>
+  </header>
+
+  <main class="modern-main">
+    <section class="game-section">
+      <div class="game-image-container">
+        <p class="game-image-label">Breaking Point: Fps Shooter</p>
+        <div class="game-image">
+          <img src="https://raw.githubusercontent.com/DarkHex999/Breakign-Point-Site/refs/heads/main/DALL%C2%B7E%202024-10-02%2009.23.16%20-%20A%20third-person%20perspective%20logo%20design%20for%20an%20FPS%20game.%20The%20player%20is%20seen%20from%20the%20back,%20with%20an%20M4%20rifle%20strapped%20to%20their%20back,%20while%20holding%20a%20kni.jpg" alt="صورة اللعبة">
+        </div>
+        <div class="store-buttons">
+          <a href="#" class="store-button">
+            <img src="https://freelogopng.com/images/all_img/1664285914google-play-logo-png.png" alt="Google Play">
+          </a>
+          <a href="#" class="store-button">
+            <img src="https://theme.zdassets.com/theme_assets/10319422/9da4f457cae242f7b7f171edc7fc650d5e3674c9.png" alt="Up To Down">
+          </a>
+          <a href="#" class="store-button">
+            <img src="https://th.bing.com/th/id/R.214f85124f4c6f59bac3f2fcecbeb1cb?rik=%2bpEK52Z%2b%2fQQSmQ&pid=ImgRaw&r=0" alt="Aptoide">
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="content-container">
+        <p class="content-text" id="dynamic-content">Welcome to Breaking Point Site👋🏻</p>
+        <div class="content-area" id="area-content">
+          <!-- سيتم تحميل وصف اللعبة من زر Home -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="modern-footer">
+    <div class="footer-bar">
+      <p class="footer-text">All rights are reserved. Breaking Point 2025</p>
     </div>
+  </footer>
 
-    <div class="page-transition"></div>
+  <!-- Hidden Privacy Policy content -->
+  <div id="privacy-policy-content" style="display: none;">
+    <h2>Privacy Policy – Breaking Point</h2>
+    <p><strong>Last Updated: [3/22/2025]</strong></p>
+    <p><strong>1. Introduction</strong><br>Welcome to Breaking Point. Your privacy is important to us, and we are committed to protecting your data. This Privacy Policy explains how we handle data within the game and your rights regarding data collection and advertising preferences.</p>
+    <p><strong>2. No Data Collection</strong><br>We do not collect, store, or process any personal or sensitive user data. Specifically, we do not collect:<br>- Your real name, address, email, or phone number.<br>- Your precise location or any other personally identifiable information.<br>- Any payment details, banking information, or financial data.<br>- Any form of biometric or health-related data.<br>All game-related progress, settings, and preferences are stored locally on your device. We do not upload, sync, or back up any of your game data to our servers. You are solely responsible for maintaining and backing up your progress. If you lose access to your device, uninstall the game, or experience data corruption, we are not responsible for restoring any lost progress.</p>
+    <p><strong>3. Third-Party Advertising & Data Collection</strong><br>Breaking Point uses third-party advertising services, including but not limited to Unity Ads, to display advertisements within the game. These third-party services may collect certain data to provide personalized ads based on your interests.<br>We do not directly collect or process this data. Instead, third-party advertisers handle data collection in compliance with their own privacy policies and applicable laws (such as GDPR, CCPA, PIPL, LGPD, and others).<br><br>Important Notice: The option to disable data collection is not available worldwide. It is only offered in regions where privacy laws require such an option, including but not limited to:<br>- GDPR (European Union)<br>- CCPA (California, USA)<br>- PIPL (China)<br>- LGPD (Brazil)<br>- Other similar regulations<br>If you are outside these regions, certain data collection may continue in accordance with the policies of third-party ad providers.<br><br>If you do not wish to receive personalized ads, you can disable targeted advertising from the in-game settings. However, you will still receive non-personalized ads that may be less relevant to you.</p>
+    <p><strong>4. No Cloud Saves or Online Account Storage</strong><br>Breaking Point does not use cloud-based storage, online accounts, or any form of server-side saving. All of your game progress is stored locally on your device. If you:<br>- Delete or uninstall the game,<br>- Reset your device,<br>- Experience technical issues that result in data loss,<br>we are not responsible for any lost progress, in-game items, or currency. There is no way to recover lost data once it is erased from your device.</p>
+    <p><strong>5. Player Consent & Access to the Game</strong><br>Upon launching the game for the first time, you will be required to accept this Privacy Policy before proceeding. If you decline, you will not be able to access or play Breaking Point. This ensures transparency and compliance with relevant privacy regulations.<br><br>Additionally, if you enable personalized advertising, you will get a 30-diamond gift for every ad watched in certain regions. This is to maintain the sustainability of the game and ensure continued development.</p>
+    <p><strong>6. Disclaimer & Liability Waiver</strong><br>By playing Breaking Point, you agree that:<br>- We are not responsible for any progress loss due to device issues, software bugs, or accidental deletions.<br>- We do not provide refunds or compensations for lost in-game currency, purchases, or progress.<br>- We do not guarantee uninterrupted or error-free gameplay. The game is provided "as-is," and while we strive to ensure a smooth experience, we are not liable for technical failures, crashes, or other unexpected issues.<br>- Your interactions with third-party ads are entirely at your own discretion. We are not responsible for external websites, products, or services linked through advertisements.</p>
+    <p><strong>7. Changes to This Privacy Policy</strong><br>We reserve the right to update or modify this Privacy Policy at any time. Any changes will be reflected in the latest version of the game, and continued use of the game implies acceptance of the updated terms.</p>
+    <p><strong>8. Contact Information</strong><br>If you have any concerns or questions regarding this Privacy Policy, please refer to the in-game support section or contact us through the provided channels.</p>
+    <p>By playing Breaking Point, you acknowledge that you have read, understood, and agreed to this Privacy Policy. If you do not agree with any part of this policy, please refrain from using the game.</p>
+  </div>
 
-    <header>
-        <div class="logo">Dark Hex</div>
-        <nav>
-            <a class="nav-link active" data-target="home">Home</a>
-            <a class="nav-link" data-target="assets">My Assets I Made</a>
-            <a class="nav-link" data-target="contact">Contact</a>
-        </nav>
-    </header>
+  <!-- Container for popup messages -->
+  <div id="popup-container"></div>
 
-    <main>
-        <section id="home" class="page-section active">
-            <h2 class="section-title">Welcome to Dark Hex Web Site</h2>
-            <div class="home-content">
-                <p>As an independent game developer, I understand the challenges of finding the right tools and assets that streamline the development process. When I encounter a gap in resources, I don't hesitate to create custom assets tailored to specific needs.</p>
-                
-                <p>Whether it's unique gameplay mechanics, tools , I focus on producing high-quality, versatile assets that other developers can rely on to enhance their projects.</p>
-                
-                <p>By uploading these creations, I aim to support fellow developers while also showcasing the innovation and craftsmanship that define my Assets.</p>
-            </div>
-        </section>
+  <script>
+    // Set initial content on page load
+    document.addEventListener("DOMContentLoaded", function(){
+      const homeLink = document.querySelector('.nav-link.active');
+      const areaContent = document.getElementById("area-content");
+      areaContent.innerHTML = homeLink.getAttribute("data-area-content").trim().replace(/^\s+/gm, "");
+    });
 
-        <section id="assets" class="page-section">
-            <h2 class="section-title">Inspector Sprite Drawer Assest</h2>
-            <div class="assets-container">
-                <div class="asset-card">
-                    <img src="https://raw.githubusercontent.com/DarkHex999/DarkHexAssestWebSite/refs/heads/main/image-420x280.jpg" alt="Asset 1" class="asset-image">
-                    <div class="asset-info">
-                        <h3 class="asset-title">Assest Image</h3>
-                        <p>Easy to use just import and it works automatically</p>
-                    </div>
-                </div>
-                <div class="asset-card">
-                    <img src="https://raw.githubusercontent.com/DarkHex999/DarkHexAssestWebSite/refs/heads/main/04.jpg" alt="Asset 2" class="asset-image">
-                    <div class="asset-info">
-                        <h3 class="asset-title">Asset Usefulness</h3>
-                        <p>Enhance the inspector experience by making images more visible instead of searching for them by name only.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+    const navLinks = document.querySelectorAll('.nav-link');
+    const dynamicContent = document.getElementById('dynamic-content');
+    const areaContent = document.getElementById('area-content');
+    let privacyPolicyContent = document.getElementById('privacy-policy-content').innerHTML;
+    privacyPolicyContent = privacyPolicyContent.replace(/^\s+/gm, "").trim();
 
-        <section id="contact" class="page-section">
-            <h2 class="section-title">Contact Me</h2>
-            <div class="contact-section">
-                <p>You can reach me at:</p>
-                <div class="contact-email">
-                    <span class="email-icon">✉️</span>
-                    <a href="mailto:masccopp@gmail.com" style="color: #ffffff; text-decoration: none;">masccopp@gmail.com</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <p class="copyright">© 2025 Dark Hex. All rights reserved.</p>
-    </footer>
-
-    <script>
-        // Canvas setup for hologram-like floating lines
-        const canvas = document.getElementById('hologramCanvas');
-        const ctx = canvas.getContext('2d');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(event) {
+        event.preventDefault();
+        dynamicContent.textContent = this.getAttribute('data-content').trim();
         
-        // Set canvas size to match window
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        if (this.textContent.trim() === "Privacy Policy") {
+          areaContent.innerHTML = privacyPolicyContent;
+        } else {
+          areaContent.innerHTML = this.getAttribute('data-area-content').trim().replace(/^\s+/gm, "");
         }
         
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        
-        // Line particles class
-        class Line {
-            constructor() {
-                this.reset();
-            }
-            
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.length = Math.random() * 100 + 50;
-                this.angle = Math.random() * 2 * Math.PI;
-                this.speed = Math.random() * 0.5 + 0.1;
-                this.opacity = Math.random() * 0.5 + 0.1;
-                this.width = Math.random() * 1.5 + 0.5;
-                this.color = `rgba(255, 255, 255, ${this.opacity})`;
-            }
-            
-            update() {
-                this.x += Math.cos(this.angle) * this.speed;
-                this.y += Math.sin(this.angle) * this.speed;
-                
-                // Reset if out of bounds
-                if (this.x < -this.length || this.x > canvas.width + this.length || 
-                    this.y < -this.length || this.y > canvas.height + this.length) {
-                    this.reset();
-                }
-            }
-            
-            draw() {
-                const endX = this.x + Math.cos(this.angle) * this.length;
-                const endY = this.y + Math.sin(this.angle) * this.length;
-                
-                ctx.beginPath();
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = this.width;
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(endX, endY);
-                ctx.stroke();
-                
-                // Add glow effect
-                ctx.beginPath();
-                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity * 0.3})`;
-                ctx.lineWidth = this.width * 2;
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(endX, endY);
-                ctx.stroke();
-            }
-        }
-        
-        // Create line particles
-        const lines = [];
-        const lineCount = 50;
-        
-        for (let i = 0; i < lineCount; i++) {
-            lines.push(new Line());
-        }
-        
-        // Animation loop
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Update and draw all lines
-            lines.forEach(line => {
-                line.update();
-                line.draw();
-            });
-            
-            requestAnimationFrame(animate);
-        }
-        
-        animate();
+        navLinks.forEach(navLink => navLink.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
 
-        // Page Navigation with Faster Transition Effect
-        document.addEventListener('DOMContentLoaded', () => {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('.page-section');
-            const pageTransition = document.querySelector('.page-transition');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const target = link.getAttribute('data-target');
-                    
-                    // Skip if already active
-                    if (link.classList.contains('active')) return;
-                    
-                    // Start transition animation
-                    pageTransition.classList.add('active');
-                    
-                    // Remove active class from all nav links
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    
-                    // Add active class to clicked link
-                    link.classList.add('active');
-                    
-                    // Faster transition - reduced time from 500ms to 250ms
-                    setTimeout(() => {
-                        // Hide all sections
-                        sections.forEach(section => section.classList.remove('active'));
-                        
-                        // Show target section
-                        document.getElementById(target).classList.add('active');
-                        
-                        // Close transition animation
-                        pageTransition.classList.add('closing');
-                        
-                        setTimeout(() => {
-                            pageTransition.classList.remove('active');
-                            pageTransition.classList.remove('closing');
-                        }, 250); // Faster closing animation
-                    }, 250); // Faster transition
-                });
-            });
-        });
-    </script>
+    // Function to show a popup message using transitions for fade in and fade out
+    function showPopupMessage(storeType, iconSrc) {
+      let text = "";
+      if (storeType === "google") {
+        text = "The game on google play store is under review and will be available soon.";
+      } else if (storeType === "up") {
+        text = "The game on Up To Down store is under review and will be available soon.";
+      } else if (storeType === "aptoide") {
+        text = "The game on Aptoide store is under review and will be available soon.";
+      }
+      
+      const container = document.getElementById('popup-container');
+      const popup = document.createElement('div');
+      popup.className = 'popup-message';
+      // Ensure initial style for transition
+      popup.style.opacity = "0";
+      popup.style.transform = "translateY(20px)";
+      
+      // Create icon element
+      const icon = document.createElement('img');
+      icon.className = 'popup-icon';
+      icon.src = iconSrc;
+      popup.appendChild(icon);
+      
+      // Create text span
+      const textSpan = document.createElement('span');
+      textSpan.textContent = text;
+      popup.appendChild(textSpan);
+      
+      // Create timeline element
+      const timeline = document.createElement('div');
+      timeline.className = 'timeline';
+      popup.appendChild(timeline);
+      
+      container.appendChild(popup);
+      
+      // Force reflow then fade in
+      requestAnimationFrame(() => {
+        popup.style.opacity = "1";
+        popup.style.transform = "translateY(0)";
+      });
+      
+      // Animate timeline shrinking over 1.5 seconds
+      timeline.style.transition = "width 1.5s linear";
+      timeline.offsetWidth; // force reflow
+      timeline.style.width = "0";
+      
+      // بعد 1.5 ثانية ابدأ التلاشي
+      setTimeout(() => {
+        popup.style.opacity = "0";
+        popup.style.transform = "translateY(-20px)";
+      }, 1500);
+      
+      // إزالة العنصر بعد انتهاء تأثير التلاشي (0.5 ثانية)
+      setTimeout(() => {
+        if (container.contains(popup)) {
+          container.removeChild(popup);
+        }
+      }, 2100);
+    }
+
+    // Store buttons click event with distinct messages and icon insertion
+    document.querySelectorAll('.store-button').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const link = this.getAttribute('href').trim();
+        if(link === '#' || link === '') {
+          e.preventDefault();
+          const img = this.querySelector('img');
+          let storeType = "";
+          const altText = img.alt.toLowerCase();
+          if(altText.includes("google")) {
+            storeType = "google";
+          } else if(altText.includes("up to down") || altText.includes("up")) {
+            storeType = "up";
+          } else if(altText.includes("aptoide")) {
+            storeType = "aptoide";
+          }
+          const iconSrc = img.getAttribute('src');
+          showPopupMessage(storeType, iconSrc);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
